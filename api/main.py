@@ -5,7 +5,7 @@ from utils.main import mm_stats_exist, faceit_stats_exist, get_mm_stats, get_fac
 app = Flask(__name__)
 
 
-@app.route('/stats/view/mm/<int:steam_id>', methods=['GET', 'POST'])
+@app.route('/stats/view/mm/<int:steam_id>', methods=['GET'])
 def mm_stats_view(steam_id):
     if mm_stats_exist(steam_id):
         _stats = get_mm_stats(steam_id)
@@ -39,7 +39,7 @@ def mm_stats_view(steam_id):
         return jsonify(_stats)
 
 
-@app.route('/stats/view/faceit/<int:steam_id>', methods=['GET', 'POST'])
+@app.route('/stats/view/faceit/<int:steam_id>', methods=['GET'])
 def faceit_stats_view(steam_id):
     if faceit_stats_exist(steam_id):
         _stats = get_faceit_stats(steam_id)
@@ -71,7 +71,7 @@ def faceit_stats_view(steam_id):
         return jsonify(_stats)
 
 
-@app.route('/stats/update/mm/<int:steam_id>', methods=['GET', 'POST'])
+@app.route('/stats/update/mm/<int:steam_id>', methods=['GET'])
 def mm_stats_update(steam_id):
     if mm_stats_exist(steam_id):
         _stats = collect_mm_stats(steam_id)
@@ -88,7 +88,7 @@ def mm_stats_update(steam_id):
         })
 
 
-@app.route('/stats/update/faceit/<int:steam_id>', methods=['GET', 'POST'])
+@app.route('/stats/update/faceit/<int:steam_id>', methods=['GET'])
 def faceit_stats_update(steam_id):
     if faceit_stats_exist(steam_id):
         _stats = collect_faceit_stats(steam_id)
