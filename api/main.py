@@ -31,8 +31,8 @@ def mm_stats_view(steam_id):
 
         if not _stats:
             return jsonify({
-                "error": "The Steam ID provided is invalid."
-            })
+                "error": "No stats found for the given Steam ID."
+            }), 404
 
         insert_mm_stats(steam_id, _stats)
 
@@ -63,8 +63,8 @@ def faceit_stats_view(steam_id):
 
         if not _stats:
             return jsonify({
-                "error": "No FaceIT stats found for the given Steam ID."
-            })
+                "error": "No stats found for the given Steam ID."
+            }), 404
 
         insert_faceit_stats(steam_id, _stats)
 
@@ -84,8 +84,8 @@ def mm_stats_update(steam_id):
 
     else:
         return jsonify({
-            "error": "No stats currently exist for this Steam ID."
-        })
+            "error": "No stats currently exist for the given Steam ID."
+        }), 404
 
 
 @app.route('/stats/update/faceit/<int:steam_id>', methods=['GET'])
@@ -101,8 +101,8 @@ def faceit_stats_update(steam_id):
 
     else:
         return jsonify({
-            "error": "No stats currently exist for this Steam ID."
-        })
+            "error": "No stats currently exist for the given Steam ID."
+        }), 404
 
 
 if __name__ == '__main__':
