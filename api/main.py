@@ -1,12 +1,26 @@
+from flask_selfdoc import Autodoc
 from flask import Flask, jsonify
 from utils.main import mm_stats_exist, faceit_stats_exist, get_mm_stats, get_faceit_stats, collect_mm_stats, \
     collect_faceit_stats, insert_mm_stats, insert_faceit_stats, update_mm_stats, update_faceit_stats
 
 app = Flask(__name__)
 
+auto = Autodoc(app)
 
+
+@auto.doc()
 @app.route('/stats/view/mm/<int:steam_id>', methods=['GET'])
 def mm_stats_view(steam_id):
+    """
+    Return matchmaking stats for the given Steam ID.
+
+    responses:
+        200:
+            description: Stats generated / found for the given Steam ID
+        404:
+            description: No stats found for the given Steam ID
+    """
+
     if mm_stats_exist(steam_id):
         _stats = get_mm_stats(steam_id)
 
@@ -39,8 +53,19 @@ def mm_stats_view(steam_id):
         return jsonify(_stats)
 
 
+@auto.doc()
 @app.route('/stats/view/faceit/<int:steam_id>', methods=['GET'])
 def faceit_stats_view(steam_id):
+    """
+    Return FaceIT stats for the given Steam ID.
+
+    responses:
+        200:
+            description: Stats generated / found for the given Steam ID
+        404:
+            description: No stats found for the given Steam ID
+    """
+
     if faceit_stats_exist(steam_id):
         _stats = get_faceit_stats(steam_id)
 
@@ -71,8 +96,19 @@ def faceit_stats_view(steam_id):
         return jsonify(_stats)
 
 
+@auto.doc()
 @app.route('/stats/update/mm/<int:steam_id>', methods=['GET'])
 def mm_stats_update(steam_id):
+    """
+    Update matchmaking stats for the given Steam ID.
+
+    responses:
+        200:
+            description: Stats generated / found for the given Steam ID
+        404:
+            description: No stats found for the given Steam ID
+    """
+
     if mm_stats_exist(steam_id):
         _stats = collect_mm_stats(steam_id)
 
@@ -88,8 +124,19 @@ def mm_stats_update(steam_id):
         }), 404
 
 
+@auto.doc()
 @app.route('/stats/update/faceit/<int:steam_id>', methods=['GET'])
 def faceit_stats_update(steam_id):
+    """
+    Update FaceIT stats for the given Steam ID.
+
+    responses:
+        200:
+            description: Stats generated / found for the given Steam ID
+        404:
+            description: No stats found for the given Steam ID
+    """
+
     if faceit_stats_exist(steam_id):
         _stats = collect_faceit_stats(steam_id)
 
@@ -103,6 +150,11 @@ def faceit_stats_update(steam_id):
         return jsonify({
             "error": "No stats currently exist for the given Steam ID."
         }), 404
+
+
+@app.route('/docs')
+def docs():
+    return auto.html()
 
 
 if __name__ == '__main__':
