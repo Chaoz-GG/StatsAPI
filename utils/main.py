@@ -10,7 +10,7 @@ from selenium.webdriver.support import expected_conditions as ec
 from selenium.common.exceptions import TimeoutException
 
 
-with open('../config.json') as json_file:
+with open('config.json') as json_file:
     data = json.load(json_file)
     db_name = data['db_name']
     db_user = data['db_user']

@@ -2,16 +2,15 @@
 
 BASE=data/gunicorn
 
-source .venv/bin/activate
-export FLASK_APP=StatsAPI/app.py
-export FLASK_SECRETS=config.py
+source venv/bin/activate
+export FLASK_APP=StatsAPI/main.py
 export FLASK_DEBUG=0
 export FLASK_ENV=production
 
 mkdir -p $BASE
 
 gunicorn \
-  --bind localhost:5000 wsgi:app \
+  --bind localhost:5000 api/main:app \
   --log-file $BASE/gunicorn.log \
   --pid $BASE/gunicorn.pid \
   --access-logfile $BASE/access.log \
