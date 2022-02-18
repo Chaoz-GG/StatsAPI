@@ -10,7 +10,7 @@ export FLASK_ENV=production
 mkdir -p $BASE
 
 gunicorn \
-  --bind localhost:5000 api/main:app \
+  --bind localhost:5000 api.main:app \
   --log-file $BASE/gunicorn.log \
   --pid $BASE/gunicorn.pid \
   --access-logfile $BASE/access.log \
