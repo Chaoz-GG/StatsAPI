@@ -47,7 +47,7 @@ def mm_stats_exist(steam_id: int):
     cursor = db.cursor(buffered=True)
 
     # noinspection SqlDialectInspection, SqlNoDataSourceInspection
-    cursor.execute('select STEAM_ID from MM_Stats;')
+    cursor.execute('select STEAM_ID from mm_stats;')
 
     for i in cursor:
         if steam_id in i:
@@ -65,7 +65,7 @@ def faceit_stats_exist(steam_id: int):
     cursor = db.cursor(buffered=True)
 
     # noinspection SqlDialectInspection, SqlNoDataSourceInspection
-    cursor.execute('select STEAM_ID from FaceIT_Stats;')
+    cursor.execute('select STEAM_ID from faceit_stats;')
 
     for i in cursor:
         if steam_id in i:
@@ -83,7 +83,7 @@ def get_mm_stats(steam_id: int):
     cursor = db.cursor(buffered=True)
 
     # noinspection SqlDialectInspection, SqlNoDataSourceInspection
-    cursor.execute(f'select * from MM_Stats where STEAM_ID = %s;', (steam_id, ))
+    cursor.execute(f'select * from mm_stats where STEAM_ID = %s;', (steam_id, ))
 
     res = cursor.fetchone()
 
@@ -99,7 +99,7 @@ def get_faceit_stats(steam_id: int):
     cursor = db.cursor(buffered=True)
 
     # noinspection SqlDialectInspection, SqlNoDataSourceInspection
-    cursor.execute(f'select * from FaceIT_Stats where STEAM_ID = %s;', (steam_id, ))
+    cursor.execute(f'select * from faceit_stats where STEAM_ID = %s;', (steam_id, ))
 
     res = cursor.fetchone()
 
@@ -269,7 +269,7 @@ def insert_mm_stats(steam_id: int, stats: dict):
     cursor = db.cursor(buffered=True)
 
     # noinspection SqlDialectInspection,SqlNoDataSourceInspection
-    cursor.execute(f'insert into MM_Stats (STEAM_ID, RANK, KPD, RATING, CLUTCH, '
+    cursor.execute(f'insert into mm_stats (STEAM_ID, RANK, KPD, RATING, CLUTCH, '
                    f'BEST_WEAPON, WIN_RATE, HS, ADR, ENTRY_SUCCESS, MOST_PLAYED_MAP, MOST_SUCCESSFUL_MAP) '
                    f'values(%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s);',
                    (steam_id, stats["rank"], stats["kpd"],
@@ -287,7 +287,7 @@ def insert_faceit_stats(steam_id: int, stats: dict):
     cursor = db.cursor(buffered=True)
 
     # noinspection SqlDialectInspection,SqlNoDataSourceInspection
-    cursor.execute(f'insert into FaceIT_Stats (STEAM_ID, RANK, ELO, KPD, RATING, '
+    cursor.execute(f'insert into faceit_stats (STEAM_ID, RANK, ELO, KPD, RATING, '
                    f'WIN_RATE, HS, MATCHES, MOST_PLAYED_MAP, MOST_SUCCESSFUL_MAP) '
                    f'values(%s, %s, %s, %s, %s, %s, %s, %s, %s, %s);',
                    (steam_id, stats["rank"], stats["elo"], stats["kpd"],
@@ -305,7 +305,7 @@ def update_mm_stats(steam_id: int, stats: dict):
     cursor = db.cursor(buffered=True)
 
     # noinspection SqlDialectInspection,SqlNoDataSourceInspection
-    cursor.execute(f'update MM_Stats set RANK = %s, KPD = %s, RATING = %s, '
+    cursor.execute(f'update mm_stats set RANK = %s, KPD = %s, RATING = %s, '
                    f'CLUTCH = %s, BEST_WEAPON = %s, WIN_RATE = %s, HS = %s, ADR = %s, ENTRY_SUCCESS = %s, '
                    f'MOST_PLAYED_MAP = %s, MOST_SUCCESSFUL_MAP = %s where STEAM_ID = %s;',
                    (stats["rank"], stats["kpd"], stats["rating"],
@@ -323,7 +323,7 @@ def update_faceit_stats(steam_id: int, stats: dict):
     cursor = db.cursor(buffered=True)
 
     # noinspection SqlDialectInspection,SqlNoDataSourceInspection
-    cursor.execute(f'update FaceIT_Stats set RANK = %s, ELO = %s, KPD = %s, RATING = %s, '
+    cursor.execute(f'update faceit_stats set RANK = %s, ELO = %s, KPD = %s, RATING = %s, '
                    f'WIN_RATE = %s, HS = %s, MATCHES = %s, '
                    f'MOST_PLAYED_MAP = %s, MOST_SUCCESSFUL_MAP = %s where STEAM_ID = %s;',
                    (stats["rank"], stats["elo"], stats["kpd"], stats["rating"],
