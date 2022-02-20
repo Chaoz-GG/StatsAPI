@@ -3,7 +3,6 @@ import json
 import mysql.connector
 
 import undetected_chromedriver as uc
-from seleniumwire import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as ec
@@ -110,7 +109,7 @@ def get_faceit_stats(steam_id: int):
 
 
 def collect_mm_stats(steam_id: int):
-    options = webdriver.ChromeOptions()
+    options = uc.ChromeOptions()
     options.add_argument('--headless')
     options.add_argument('--no-sandbox')
 
@@ -194,7 +193,7 @@ def collect_mm_stats(steam_id: int):
 
 
 def collect_faceit_stats(steam_id: int):
-    options = webdriver.ChromeOptions()
+    options = uc.ChromeOptions()
     options.add_argument('--headless')
     options.add_argument('--no-sandbox')
 
