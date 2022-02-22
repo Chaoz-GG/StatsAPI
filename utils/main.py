@@ -211,9 +211,15 @@ def collect_faceit_stats(steam_id: int):
     except TimeoutException:
         return None
 
-    rank = WebDriverWait(driver, 10).until(
-        ec.visibility_of_element_located((By.XPATH, '/html/body/div[1]/main/div/div[1]/div/div/div[4]/img'))
-    ).get_attribute("src")
+    try:
+        rank = WebDriverWait(driver, 10).until(
+            ec.visibility_of_element_located((By.XPATH, '/html/body/div[1]/main/div/div[1]/div/div/div[4]/img'))
+        ).get_attribute("src")
+
+    except TimeoutException:
+        rank = WebDriverWait(driver, 10).until(
+            ec.visibility_of_element_located((By.XPATH, '/html/body/div[1]/main/div/div[1]/div/div/div[3]/img'))
+        ).get_attribute("src")
 
     rank = int(rank.rsplit('/')[-1][:-4].rsplit('_')[-2])
 
