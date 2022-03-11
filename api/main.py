@@ -1,7 +1,7 @@
 from flask_selfdoc import Autodoc
 from flask import Flask, jsonify
 from utils.main import mm_stats_exist, faceit_stats_exist, get_mm_stats, get_faceit_stats, collect_mm_stats, \
-    collect_faceit_stats, insert_mm_stats, insert_faceit_stats, update_mm_stats, update_faceit_stats
+    collect_faceit_stats, insert_mm_stats, insert_faceit_stats, update_mm_stats, update_faceit_stats, get_inventory
 
 app = Flask(__name__)
 
@@ -149,6 +149,30 @@ def faceit_stats_update(steam_id):
     else:
         return jsonify({
             "error": "No stats currently exist for the given Steam ID."
+        }), 404
+
+
+@auto.doc()
+@app.route('/inventory/<int:steam_id>', methods=['GET'])
+def inventory(steam_id):
+    """
+    Update FaceIT stats for the given Steam ID.
+
+    responses:
+        200:
+            description: Inventory details found for the given Steam ID
+        404:
+            description: No inventory details found for the given Steam ID
+    """
+
+    _inv = get_inventory(steam_id)
+
+    if _inv:
+        return jsonify(_inv)
+
+    else:
+        return jsonify({
+            "error": "No inventory details found for the given steam ID."
         }), 404
 
 

@@ -268,6 +268,41 @@ def collect_faceit_stats(steam_id: int):
     }
 
 
+def get_inventory(steam_id: int):
+    options = uc.ChromeOptions()
+    options.add_argument('--headless')
+    options.add_argument('--no-sandbox')
+
+    driver = uc.Chrome(use_subprocess=True, options=options)
+
+    driver.get(f'https://csgobackpack.net/index.php?nick={steam_id}&currency=USD')
+
+    button = WebDriverWait(driver, 20).until(
+        ec.visibility_of_element_located
+        ((By.XPATH, '//*[@id="get_inventory"]')))
+
+    button.click()
+
+    driver.implicitly_wait(10)
+
+    try:
+        item_count = WebDriverWait(driver, 20).until(
+            ec.visibility_of_element_located(
+                (By.XPATH, '/html/body/div[1]/div/div[2]/div[1]/p[1]'))).text
+
+        value = WebDriverWait(driver, 20).until(
+            ec.visibility_of_element_located(
+                (By.XPATH, '/html/body/div[1]/div/div[2]/div[1]/h3[1]/p'))).text
+
+    except TimeoutException:
+        return None
+
+    return {
+        'item_count': int(item_count),
+        'value': float(value[1:])
+    }
+
+
 def insert_mm_stats(steam_id: int, stats: dict):
     db = mysql.connector.connect(host=db_host, port=db_port, user=db_user,
                                  passwd=db_password, database=db_name)
