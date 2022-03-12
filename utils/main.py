@@ -135,7 +135,7 @@ def collect_mm_stats(steam_id: int):
 
     rating = WebDriverWait(driver, 10).until(
         ec.visibility_of_element_located((By.XPATH, '//*[@id="rating"]/span'))).text
-    clutch = WebDriverWait(driver, 20).until(ec.visibility_of_element_located((By.XPATH, '//*[@id="player-overview"]'
+    clutch = WebDriverWait(driver, 10).until(ec.visibility_of_element_located((By.XPATH, '//*[@id="player-overview"]'
                                                                                          '/div[2]/div/div[1]/div[2]/'
                                                                                          'div[1]/span[2]'))).text
 
@@ -277,20 +277,20 @@ def get_inventory(steam_id: int):
 
     driver.get(f'https://csgobackpack.net/index.php?nick={steam_id}&currency=USD')
 
-    button = WebDriverWait(driver, 20).until(
-        ec.visibility_of_element_located
-        ((By.XPATH, '//*[@id="get_inventory"]')))
+    button = WebDriverWait(driver, 10).until(
+        ec.element_to_be_clickable
+        ((By.ID, 'get_inventory')))
 
     button.click()
 
     driver.implicitly_wait(10)
 
     try:
-        item_count = WebDriverWait(driver, 20).until(
+        item_count = WebDriverWait(driver, 10).until(
             ec.visibility_of_element_located(
                 (By.XPATH, '/html/body/div[1]/div/div[2]/div[1]/p[1]'))).text
 
-        value = WebDriverWait(driver, 20).until(
+        value = WebDriverWait(driver, 10).until(
             ec.visibility_of_element_located(
                 (By.XPATH, '/html/body/div[1]/div/div[2]/div[1]/h3[1]/p'))).text
 
