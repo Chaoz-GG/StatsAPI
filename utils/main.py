@@ -40,7 +40,7 @@ mm_ranks = {
         }
 
 
-def mm_stats_exist(steam_id: int):
+def non_empty_mm_stats_exist(steam_id: int):
     db = mysql.connector.connect(host=db_host, port=db_port, user=db_user,
                                  passwd=db_password, database=db_name)
     cursor = db.cursor(buffered=True)
@@ -50,15 +50,21 @@ def mm_stats_exist(steam_id: int):
 
     for i in cursor:
         if steam_id in i:
+            # noinspection SqlDialectInspection, SqlNoDataSourceInspection
+            cursor.execute('select RANK from mm_stats where STEAM_ID = %s;', (steam_id,))
+
+            res = cursor.fetchone()
+
             cursor.close()
             db.close()
 
-            return True
+            if res:
+                return True
 
     return False
 
 
-def faceit_stats_exist(steam_id: int):
+def non_empty_faceit_stats_exist(steam_id: int):
     db = mysql.connector.connect(host=db_host, port=db_port, user=db_user,
                                  passwd=db_password, database=db_name)
     cursor = db.cursor(buffered=True)
@@ -68,10 +74,16 @@ def faceit_stats_exist(steam_id: int):
 
     for i in cursor:
         if steam_id in i:
+            # noinspection SqlDialectInspection, SqlNoDataSourceInspection
+            cursor.execute('select RANK from faceit_stats where STEAM_ID = %s;', (steam_id, ))
+
+            res = cursor.fetchone()[0]
+
             cursor.close()
             db.close()
 
-            return True
+            if res:
+                return True
 
     return False
 
@@ -118,13 +130,13 @@ def collect_mm_stats(steam_id: int):
     driver.get(f'https://csgostats.gg/player/{steam_id}')
 
     try:
-        kpd = WebDriverWait(driver, 10).until(ec.visibility_of_element_located((By.XPATH, '//*[@id="kpd"]/span'))).text
+        kpd = WebDriverWait(driver, 5).until(ec.visibility_of_element_located((By.XPATH, '//*[@id="kpd"]/span'))).text
 
     except TimeoutException:
         return None
 
     try:
-        rank = WebDriverWait(driver, 10).until(
+        rank = WebDriverWait(driver, 5).until(
             ec.visibility_of_element_located((By.XPATH, '/html/body/div[2]/div/div[3]/div[1]/div/div[2]/div[1]/img'))
         ).get_attribute("src")
 
@@ -133,30 +145,30 @@ def collect_mm_stats(steam_id: int):
     except TimeoutException:
         rank = mm_ranks[0]
 
-    rating = WebDriverWait(driver, 10).until(
+    rating = WebDriverWait(driver, 5).until(
         ec.visibility_of_element_located((By.XPATH, '//*[@id="rating"]/span'))).text
-    clutch = WebDriverWait(driver, 10).until(ec.visibility_of_element_located((By.XPATH, '//*[@id="player-overview"]'
-                                                                                         '/div[2]/div/div[1]/div[2]/'
-                                                                                         'div[1]/span[2]'))).text
+    clutch = WebDriverWait(driver, 5).until(ec.visibility_of_element_located((By.XPATH, '//*[@id="player-overview"]'
+                                                                                        '/div[2]/div/div[1]/div[2]/'
+                                                                                        'div[1]/span[2]'))).text
 
-    best_weapon = WebDriverWait(driver, 10).until(
+    best_weapon = WebDriverWait(driver, 5).until(
         ec.visibility_of_element_located((By.XPATH, '//*[@id="player-overview"]'
                                                     '/div[3]/div/div[3]/div[1]/div/'
                                                     'div[2]/div[1]/div[1]/div/img'))
         ).get_attribute("alt")
 
-    win_rate = WebDriverWait(driver, 10)\
+    win_rate = WebDriverWait(driver, 5)\
         .until(ec.visibility_of_element_located((By.XPATH,
                                                  '/html/body/div[2]/div/div[3]/div[3]/div[2]/div[2]/div[2]/div/div[1]'
                                                  '/div[1]/div[3]/div/div[2]/div[2]'))).text
-    hs = WebDriverWait(driver, 10)\
+    hs = WebDriverWait(driver, 5)\
         .until(ec.visibility_of_element_located((By.XPATH, '/html/body/div[2]/div/div[3]/div[3]/div[2]/div[2]/div[2]'
                                                            '/div/div[1]/div[1]/div[4]/div/div[2]/div[2]'))).text
-    adr = WebDriverWait(driver, 10)\
+    adr = WebDriverWait(driver, 5)\
         .until(ec.visibility_of_element_located((By.XPATH, '/html/body/div[2]/div/div[3]/div[3]/div[2]/div[2]/div[2]'
                                                            '/div/div[1]/div[1]/div[5]/div/div[2]/div[2]'))).text
 
-    entry_success = WebDriverWait(driver, 10)\
+    entry_success = WebDriverWait(driver, 5)\
         .until(ec.visibility_of_element_located((By.XPATH, '/html/body/div[2]/div/div[3]/div[3]/div[2]/div[2]/div[2]'
                                                            '/div/div[1]/div[2]/div/div[2]/div[2]/div[1]/span[2]'))).text
 
@@ -164,11 +176,11 @@ def collect_mm_stats(steam_id: int):
     hs = hs.split()[0]
     adr = adr.split()[0]
 
-    most_played_map = WebDriverWait(driver, 10)\
+    most_played_map = WebDriverWait(driver, 5)\
         .until(ec.visibility_of_element_located((By.XPATH, '/html/body/div[2]/div/div[3]/div[3]/div[2]/div[2]/div[2]'
                                                            '/div/div[1]/div[3]/div/div[2]/div[1]/div/div/div[2]/div[1]'
                                                            '/div[1]/div[1]/span'))).text
-    most_successful_map = WebDriverWait(driver, 10)\
+    most_successful_map = WebDriverWait(driver, 5)\
         .until(ec.visibility_of_element_located((By.XPATH, '/html/body/div[2]/div/div[3]/div[3]/div[2]/div[2]/div[2]'
                                                            '/div/div[1]/div[3]/div/div[2]/div[2]/div/div/div[2]/div[1]'
                                                            '/div[1]/div[1]/span'))).text
@@ -202,7 +214,7 @@ def collect_faceit_stats(steam_id: int):
     driver.get(f'https://faceitfinder.com/stats/{steam_id}')
 
     try:
-        elo = WebDriverWait(driver, 10).until(
+        elo = WebDriverWait(driver, 5).until(
             ec.visibility_of_element_located(
                 (By.XPATH, '/html/body/div[1]/main/div/div[2]/div/div[4]/div[3]/span'))).text
 
@@ -212,42 +224,42 @@ def collect_faceit_stats(steam_id: int):
         return None
 
     try:
-        rank = WebDriverWait(driver, 10).until(
+        rank = WebDriverWait(driver, 5).until(
             ec.visibility_of_element_located((By.XPATH, '/html/body/div[1]/main/div/div[1]/div/div/div[4]/img'))
         ).get_attribute("src")
 
     except TimeoutException:
-        rank = WebDriverWait(driver, 10).until(
+        rank = WebDriverWait(driver, 5).until(
             ec.visibility_of_element_located((By.XPATH, '/html/body/div[1]/main/div/div[1]/div/div/div[3]/img'))
         ).get_attribute("src")
 
     rank = int(rank.rsplit('/')[-1][:-4].rsplit('_')[-2])
 
-    kpd = WebDriverWait(driver, 10).until(ec.visibility_of_element_located((By.XPATH, '/html/body/div[1]/main/div/'
-                                                                                      'div[2]/div/div[1]/div[3]/'
-                                                                                      'span'))).text
+    kpd = WebDriverWait(driver, 5).until(ec.visibility_of_element_located((By.XPATH, '/html/body/div[1]/main/div/'
+                                                                                     'div[2]/div/div[1]/div[3]/'
+                                                                                     'span'))).text
 
-    rating = WebDriverWait(driver, 10).until(
+    rating = WebDriverWait(driver, 5).until(
         ec.visibility_of_element_located((By.XPATH, '/html/body/div[1]/main/div/div[2]/div/div[3]/div[3]/span'))).text
 
-    win_rate = WebDriverWait(driver, 10)\
+    win_rate = WebDriverWait(driver, 5)\
         .until(ec.visibility_of_element_located((By.XPATH,
                                                  '/html/body/div[1]/main/div/div[2]/div/div[2]/div[3]/span'))).text
 
-    hs = WebDriverWait(driver, 10)\
+    hs = WebDriverWait(driver, 5)\
         .until(ec.visibility_of_element_located((By.XPATH,
                                                  '/html/body/div[1]/main/div/div[2]/div/div[5]/div[3]/span'))).text
 
-    matches = WebDriverWait(driver, 10)\
+    matches = WebDriverWait(driver, 5)\
         .until(ec.visibility_of_element_located((By.XPATH,
                                                  '/html/body/div[1]/main/div/div[2]/div/div[6]/div[3]/span'))).text
 
     driver.get(f'https://faceitfinder.com/stats/{steam_id}/maps')
 
-    most_played_map = WebDriverWait(driver, 10)\
+    most_played_map = WebDriverWait(driver, 5)\
         .until(ec.visibility_of_element_located((By.XPATH, '/html/body/div[1]/main/div/div[2]/table/tbody/'
                                                            'tr[1]/td[1]'))).text
-    most_successful_map = WebDriverWait(driver, 10)\
+    most_successful_map = WebDriverWait(driver, 5)\
         .until(ec.visibility_of_element_located((By.XPATH, '/html/body/div[1]/main/div/div[2]/table/tbody/'
                                                            'tr[1]/td[1]'))).text
 
@@ -277,20 +289,20 @@ def get_inventory(steam_id: int):
 
     driver.get(f'https://csgobackpack.net/index.php?nick={steam_id}&currency=USD')
 
-    button = WebDriverWait(driver, 10).until(
+    button = WebDriverWait(driver, 5).until(
         ec.element_to_be_clickable
         ((By.ID, 'get_inventory')))
 
     button.click()
 
-    driver.implicitly_wait(10)
+    driver.implicitly_wait(5)
 
     try:
-        item_count = WebDriverWait(driver, 10).until(
+        item_count = WebDriverWait(driver, 5).until(
             ec.visibility_of_element_located(
                 (By.XPATH, '/html/body/div[1]/div/div[2]/div[1]/p[1]'))).text
 
-        value = WebDriverWait(driver, 10).until(
+        value = WebDriverWait(driver, 5).until(
             ec.visibility_of_element_located(
                 (By.XPATH, '/html/body/div[1]/div/div[2]/div[1]/h3[1]/p'))).text
 
@@ -303,36 +315,56 @@ def get_inventory(steam_id: int):
     }
 
 
-def insert_mm_stats(steam_id: int, stats: dict):
+def insert_mm_stats(steam_id: int, stats: dict = None):
     db = mysql.connector.connect(host=db_host, port=db_port, user=db_user,
                                  passwd=db_password, database=db_name)
     cursor = db.cursor(buffered=True)
 
-    # noinspection SqlDialectInspection,SqlNoDataSourceInspection
-    cursor.execute(f'insert into mm_stats (STEAM_ID, RANK, KPD, RATING, CLUTCH, '
-                   f'BEST_WEAPON, WIN_RATE, HS, ADR, ENTRY_SUCCESS, MOST_PLAYED_MAP, MOST_SUCCESSFUL_MAP) '
-                   f'values(%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s);',
-                   (steam_id, stats["rank"], stats["kpd"],
-                    stats["rating"], stats["clutch"], stats["best_weapon"], stats["win_rate"], stats["hs"],
-                    stats["adr"], stats["entry_success"], stats["most_played_map"], stats["most_successful_map"]))
+    if stats:
+        # noinspection SqlDialectInspection,SqlNoDataSourceInspection
+        cursor.execute(f'insert into mm_stats (STEAM_ID, RANK, KPD, RATING, CLUTCH, '
+                       f'BEST_WEAPON, WIN_RATE, HS, ADR, ENTRY_SUCCESS, MOST_PLAYED_MAP, MOST_SUCCESSFUL_MAP) '
+                       f'values(%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s);',
+                       (steam_id, stats["rank"], stats["kpd"],
+                        stats["rating"], stats["clutch"], stats["best_weapon"], stats["win_rate"], stats["hs"],
+                        stats["adr"], stats["entry_success"], stats["most_played_map"], stats["most_successful_map"]))
+
+    else:
+        try:
+            # noinspection SqlDialectInspection,SqlNoDataSourceInspection
+            cursor.execute('insert into mm_stats (STEAM_ID) values(%s)', (steam_id, ))
+
+        except mysql.connector.errors.IntegrityError:
+            pass
+
     db.commit()
 
     cursor.close()
     db.close()
 
 
-def insert_faceit_stats(steam_id: int, stats: dict):
+def insert_faceit_stats(steam_id: int, stats: dict = None):
     db = mysql.connector.connect(host=db_host, port=db_port, user=db_user,
                                  passwd=db_password, database=db_name)
     cursor = db.cursor(buffered=True)
 
-    # noinspection SqlDialectInspection,SqlNoDataSourceInspection
-    cursor.execute(f'insert into faceit_stats (STEAM_ID, RANK, ELO, KPD, RATING, '
-                   f'WIN_RATE, HS, MATCHES, MOST_PLAYED_MAP, MOST_SUCCESSFUL_MAP) '
-                   f'values(%s, %s, %s, %s, %s, %s, %s, %s, %s, %s);',
-                   (steam_id, stats["rank"], stats["elo"], stats["kpd"],
-                    stats["rating"], stats["win_rate"], stats["hs"],
-                    stats["matches"], stats["most_played_map"], stats["most_successful_map"]))
+    if stats:
+        # noinspection SqlDialectInspection,SqlNoDataSourceInspection
+        cursor.execute('insert into faceit_stats (STEAM_ID, RANK, ELO, KPD, RATING, '
+                       'WIN_RATE, HS, MATCHES, MOST_PLAYED_MAP, MOST_SUCCESSFUL_MAP) '
+                       'values(%s, %s, %s, %s, %s, %s, %s, %s, %s, %s);',
+                       (steam_id, stats["rank"], stats["elo"], stats["kpd"],
+                        stats["rating"], stats["win_rate"], stats["hs"],
+                        stats["matches"], stats["most_played_map"], stats["most_successful_map"]))
+
+    else:
+        try:
+            # noinspection SqlDialectInspection,SqlNoDataSourceInspection
+            cursor.execute('insert into faceit_stats (STEAM_ID) values(%s)', (steam_id, ))
+
+        except mysql.connector.errors.IntegrityError:
+            pass
+
     db.commit()
 
     cursor.close()
