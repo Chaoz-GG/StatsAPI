@@ -51,7 +51,11 @@ def mm_stats_view(steam_id):
                 "error": "No stats found for the given Steam ID."
             }), 404
 
-        insert_mm_stats(steam_id, _stats)
+        if non_empty_mm_stats_exist(steam_id):
+            update_mm_stats(steam_id, _stats)
+
+        else:
+            insert_mm_stats(steam_id, _stats)
 
         return jsonify(_stats)
 
@@ -96,7 +100,11 @@ def faceit_stats_view(steam_id):
                 "error": "No stats found for the given Steam ID."
             }), 404
 
-        insert_faceit_stats(steam_id, _stats)
+        if non_empty_faceit_stats_exist(steam_id):
+            update_faceit_stats(steam_id, _stats)
+
+        else:
+            insert_faceit_stats(steam_id, _stats)
 
         return jsonify(_stats)
 
